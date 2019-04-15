@@ -1,4 +1,15 @@
 # AndroidDynamicFlavor
+## Description
+A groovy build script that loads a JSON file and controls dynamically:
+- Flavors
+- Variants colors
+- Variants images (With auto-resolution generation)
+## Use cases
+This could be used for Whitelabel applications, with a normal configuration and visuals, but, with some variants.
+Example: An App that needs to change it's colors(Or images) when in a specific Flavor
+
+** Every resource get's overriden on the Final APK, so every generated Flavor 'll have only it's resources **
+
 
 ```groovy
 import groovy.json.JsonSlurper
