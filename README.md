@@ -8,7 +8,7 @@ A groovy build script that loads a JSON file and controls dynamically:
 This could be used for Whitelabel applications, with a normal configuration and visuals, but, with some variants.
 Example: An App that needs to change it's colors(Or images) when in a specific Flavor
 
-** Every resource get's overriden on the Final APK, so every generated Flavor 'll have only it's resources **
+**Every resource get's overriden on the Final APK, so every generated Flavor 'll have only it's resources**
 
 
 ```groovy
