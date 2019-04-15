@@ -79,8 +79,48 @@ def handleColors (flavorDirectory, flavorConfig, configuration) {
 	}
 
 	// Writes to the specified thing
-	def writer = new FileWriter (flavorDirectory.getAbsolutePath () + "/colors.xml");
+	def writer = new FileWriter (flavorDirectory.getAbsolutePath () + "/colors.xml")
 	XmlUtil.serialize (originalColorsXml, writer)
+}
+
+def handleImages (flavorResDirectory, flavorConfig) {
+	def flavorImageDirectory = new File ("$projectDir/Whitelabel/${flavorConfig.package}/images")
+	if (!flavorImageDirectory.exists ()) {
+		throw new GradleException ("The flavor ${flavorConfig.name} hasn't an image folder!")
+	}
+	// List all images inside the folder
+	flavorImageDirectory.eachFile { file ->
+		log ("Copying file ${file.getName ()} from flavor ${flavorConfig.name}...")
+
+		def resolutions = [
+				"ldpi"   : calculateDensityFactor (0.75),
+				"mdpi"   : calculateDensityFactor (1.0),
+				"hdpi"   : calculateDensityFactor (1.5),
+				"xhdpi"  : calculateDensityFactor (2.0),
+				"xxhdpi" : calculateDensityFactor (3.0),
+				"xxxhdpi": calculateDensityFactor (4.0)
+		]
+
+		def image = ImageIO.read (file)
+
+		resolutions.each { resolutionName, resolutionFactor ->
+			Integer newWidth = image.width * resolutionFactor
+			Integer newHeight = image.height * resolutionFactor
+
+			new BufferedImage (newWidth, newHeight, image.type).with { i ->
+				createGraphics ().with {
+					setRenderingHint (KEY_INTERPOLATION, VALUE_INTERPOLATION_BICUBIC)
+					drawImage (image, 0, 0, newWidth, newHeight, null)
+					dispose ()
+				}
+
+				def destinationFile = new File (flavorResDirectory.getAbsolutePath () + "/drawable-${resolutionName}/${file.getName ()}")
+				destinationFile.mkdirs ()
+				ImageIO.write (i, getFileExtension (file), destinationFile)
+			}
+		}
+
+	}
 }
 
 def calculateDensityFactor (density) {
@@ -177,43 +217,7 @@ android {
 		handleColors (flavorResValuesDirectory, flavorConfig, configuration)
 
 		// Overrides the images
-		def flavorImageDirectory = new File ("$projectDir/Whitelabel/${flavorConfig.package}/images")
-		if (!flavorImageDirectory.exists ()) {
-			throw new GradleException ("The flavor ${flavorName} hasn't an image folder!")
-		}
-		// List all images inside the folder
-		flavorImageDirectory.eachFile { file ->
-			log ("Copying file ${file.getName ()} from flavor ${flavorName}...")
-
-			def resolutions = [
-					"ldpi"   : calculateDensityFactor (0.75),
-					"mdpi"   : calculateDensityFactor (1.0),
-					"hdpi"   : calculateDensityFactor (1.5),
-					"xhdpi"  : calculateDensityFactor (2.0),
-					"xxhdpi" : calculateDensityFactor (3.0),
-					"xxxhdpi": calculateDensityFactor (4.0)
-			]
-
-			def image = ImageIO.read (file)
-
-			resolutions.each { resolutionName, resolutionFactor ->
-				Integer newWidth = image.width * resolutionFactor
-				Integer newHeight = image.height * resolutionFactor
-
-				new BufferedImage (newWidth, newHeight, image.type).with { i ->
-					createGraphics ().with {
-						setRenderingHint (KEY_INTERPOLATION, VALUE_INTERPOLATION_BICUBIC)
-						drawImage (image, 0, 0, newWidth, newHeight, null)
-						dispose ()
-					}
-
-					def destinationFile = new File (flavorResDirectory.getAbsolutePath () + "/drawable-${resolutionName}/${file.getName ()}")
-					destinationFile.mkdirs ()
-					ImageIO.write (i, getFileExtension (file), destinationFile)
-				}
-			}
-
-		}
+		handleImages (flavorResDirectory, flavorConfig)
 	}
 
 }
