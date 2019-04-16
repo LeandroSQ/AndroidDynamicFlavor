@@ -4,6 +4,7 @@ A groovy build script that loads a JSON file and controls dynamically:
 - Flavors
 - Variants colors
 - Variants images (With auto-resolution generation)
+
 ## Use cases
 This could be used for Whitelabel applications, with a normal configuration and visuals, but, with some variants.
 Example: An App that needs to change it's colors(Or images) when in a specific Flavor
