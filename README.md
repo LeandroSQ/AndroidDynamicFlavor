@@ -1,5 +1,4 @@
 # AndroidDynamicFlavor
-## Description
 A groovy build script that loads a JSON file and controls dynamically:
 - Flavors
 - Variants colors
